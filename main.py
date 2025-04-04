@@ -8,7 +8,11 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 from langchain.chains import RunnableLambda, RunnablePassthrough
 from langchain.chat_models import ChatOpenAI
 from langchain.vector_store import FAISS 
-from langchain.prompts import PromptTemplate
+from langchain.prompts import PromptTemplate 
+from langchain.memory import ConversationBufferMemory
+from langchain.chains import LLMChain 
+from fastapi import FastAPI
+
 
 
 class DoulalaLoader(PyPDFLoader, RecursiveCharacterTextSplitter): 
@@ -58,31 +62,54 @@ class Doulala_model_build:
         self.RagLayer = self.RetrievalQA.from_chain_type(llm=self.llm, 
                                                          retriever=self.retriever) 
         # Prompt Template 
-        self.prompt_template = self.PromptTemplate(prompt_structure)  
-        def build(self):  
-            self.Lala = (self.prompt_template | self.llm 
-            | RunnableLambda(lambda x: {"query": x}) | self.RAGLayer)
-            return self.Lala
         
+        self.prompt_template = self.PromptTemplate(prompt_structure)  
+        
+        #Chain Prompt Template model and memory
+        llm_chain = LLMChain(llm=self.llm,prompt=self.prompt_template,  
+        memory=memory)
+        
+        # build model by combining Chat + RAG
+        def build(self):  
+            self.Lala = (llm_chain 
+            | RunnableLambda(lambda x: {"query": x}) | self.RAGLayer)
+            return self.Lala  
 prompt_structure = """
-You are Doulala, a highly knowledgeable and deeply empathetic medical assistant who specializes in supporting women during pregnancy — across all trimesters.
+        You are Doulala, a highly knowledgeable and deeply empathetic medical assistant who specializes in supporting women during pregnancy — across all trimesters.
 
-Your role is to:
-- Provide clear, medically accurate information rooted in trusted health sources.
-- Respond in a tone that is warm, validating, reassuring, and emotionally intelligent.
-- Recognize that pregnancy is not only a medical journey, but also a physical, emotional, and mental one.
-- Help the person feel seen, safe, and genuinely cared for.
+        Your role is to:
+        - Provide clear, medically accurate information rooted in trusted health sources.
+        - Respond in a tone that is warm, validating, reassuring, and emotionally intelligent.
+        - Recognize that pregnancy is not only a medical journey, but also a physical, emotional, and mental one.
+        - Help the person feel seen, safe, and genuinely cared for.
 
-Tone guidelines:
-- Speak with gentle confidence and emotional sensitivity.
-- Acknowledge feelings, not just symptoms.
-- Avoid robotic or clinical phrasing — sound like a wise, kind friend who’s well-informed.
-- Never judge. Always reassure and empower.
+        Tone guidelines:
+        - Speak with gentle confidence and emotional sensitivity.
+        - Acknowledge feelings, not just symptoms.
+        - Avoid robotic or clinical phrasing — sound like a wise, kind friend who’s well-informed.
+        - Never judge. Always reassure and empower.
 
-User Question: {input}
+        User Question: {input}
 
-Doulala’s Response:
-"""  
+        Doulala’s Response:
+        """  
+
+model = Doulala_model_build(prompt_structure) 
+Lala_API = FastAPI() 
+class UserQuery(BaseModel):
+    input: str
+
+# POST endpoint
+@Lala_API.post("/query")
+async def query_model(data: UserQuery):
+    response = model.Lala.invoke({"input": data.input})
+    return {"response": response}
+
+
+
+
+        
+
 
 
 
