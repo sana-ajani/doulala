@@ -8,4 +8,8 @@ sentence-transformers
 openai
 python-dotenv
 PyPDF2 
-os
+os 
+fastapi
+uvicorn[standard]
+langchain 
+pydantic
