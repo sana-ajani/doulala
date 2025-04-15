@@ -7,6 +7,7 @@ from langchain.memory import ConversationBufferMemory
 import openai
 import random
 import re
+import json
 
 from dotenv import load_dotenv
 load_dotenv()  # Loads from .env file the API key
@@ -75,9 +76,30 @@ def parse_articles(output):
         articles.append({'title': title.strip(), 'url': url.strip()})
     return articles
 
-articles_dictionary = parse_articles(returned_articles)
+recommended_articles_dictionary = parse_articles(returned_articles)
 
-print(articles_dictionary)
+print(recommended_articles_dictionary)
+
+### Add Saving Functionality
+
+def save_to_json(articles_dict):
+    '''
+    Save articles to json to make it show up later
+    '''
+    output_dict = dict()
+    for key,value in articles_dict:
+        ### This is randomly generated rn, need to integrate to get user input
+        saved = random.randint(0, 1)
+        if saved == 1:
+            output_dict[key] = value
+    return output_dict
+
+saved_articles = save_to_json(recommended_articles_dictionary)
+
+with open("saved_articles.json", "w") as f:
+    json.dump(saved_articles, f, indent=2)
+
+
 
 
 
