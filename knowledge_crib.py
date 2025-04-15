@@ -112,6 +112,8 @@ def ui_knowledge_crib_call_wrapper(month_of_pregnancy, topic, mother_age):
     ### Save the articles
     save_to_json(recommeneded_articles_to_dictionary)
 
+    return None
+
 
 
 
