@@ -73,12 +73,12 @@ def parse_articles(output):
     '''
     This function takes the string model output and formats it into a dictionary
     '''
-    articles = []
+    articles = dict()
     # Regex to match: Title: ..., URL: ...
     pattern = r"Title:\s*(.*?)\s*,?\s*URL:\s*(\S+)"
     matches = re.findall(pattern, output)
     for title, url in matches:
-        articles.append({'title': title.strip(), 'url': url.strip()})
+        articles[title.strip()] =  url.strip()
     return articles
 
 
@@ -87,7 +87,7 @@ def save_to_json(articles_dict):
     Save articles to json to make it show up later
     '''
     output_dict = dict()
-    for key,value in articles_dict:
+    for key,value in articles_dict.items():
         ### This is randomly generated rn, need to integrate to get user input
         saved = random.randint(0, 1)
         if saved == 1:
