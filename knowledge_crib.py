@@ -13,7 +13,6 @@ from dotenv import load_dotenv
 load_dotenv()  # Loads from .env file the API key
 
 ### These are the options that the user can select from
-
 knowledge_topics = ['patient_development'
                  , 'child_development'
                  , 'lifestyle'
@@ -21,6 +20,9 @@ knowledge_topics = ['patient_development'
                  , 'wellness_mindfulness'
                  ]
 
+ ### hard-coded values but would pull from user-profile, not sure how to do
+month_of_pregnancy = 3
+mother_age = 27
 
 def clean_topic(topic, month_of_pregnancy):
     '''
@@ -39,15 +41,9 @@ def clean_topic(topic, month_of_pregnancy):
     return cleaned
 
 
-
-
- ### hard-coded values but would pull from user-profile, not sure how to do
-month_of_pregnancy = 3
-mother_age = 27
-
 selected_topic = clean_topic(random.choice(knowledge_topics), month_of_pregnancy)
 
-### Ping the model to search for articles
+### Model Set Up
 article_search_template = PromptTemplate(
     input_variables=['month_of_pregnancy', 'mother_age', 'topic'], 
     template=(
@@ -58,16 +54,25 @@ article_search_template = PromptTemplate(
     )
 )
 
-# Importing the large language model OpenAI via LangChain
 model = ChatOpenAI(model='gpt-3.5-turbo-16k', temperature=0.8)
 memoryT = ConversationBufferMemory(input_key='topic', memory_key='chat_history')
 chainT = LLMChain(llm=model, prompt=article_search_template, verbose=True, output_key='article_search', memory=memoryT)
 
 # Call the Model
-returned_articles = chainT.run(month_of_pregnancy=month_of_pregnancy, topic=selected_topic)
 
-# Parse the articles into a dictionary that will be easier to show in the front end
+def call_model(month_of_pregnancy, topic):
+    '''
+    This function calls the model and outputs the formatted
+    URLs of the articles that the user searches for.
+    '''
+    returned_articles = chainT.run(month_of_pregnancy=month_of_pregnancy, topic=selected_topic)
+    return returned_articles
+
+
 def parse_articles(output):
+    '''
+    This function takes the string model output and formats it into a dictionary
+    '''
     articles = []
     # Regex to match: Title: ..., URL: ...
     pattern = r"Title:\s*(.*?)\s*,?\s*URL:\s*(\S+)"
@@ -76,11 +81,6 @@ def parse_articles(output):
         articles.append({'title': title.strip(), 'url': url.strip()})
     return articles
 
-recommended_articles_dictionary = parse_articles(returned_articles)
-
-print(recommended_articles_dictionary)
-
-### Add Saving Functionality
 
 def save_to_json(articles_dict):
     '''
@@ -92,12 +92,27 @@ def save_to_json(articles_dict):
         saved = random.randint(0, 1)
         if saved == 1:
             output_dict[key] = value
+    with open("saved_articles.json", "w") as f:
+        json.dump(output_dict, f, indent=2)
     return output_dict
 
-saved_articles = save_to_json(recommended_articles_dictionary)
+def ui_knowledge_crib_call_wrapper(month_of_pregnancy, topic, mother_age):
+    '''
+    This is a wrapper function that will be called every time the user enters 
+    the knowledge crib interface and clicks on a particular topic.
+    '''
 
-with open("saved_articles.json", "w") as f:
-    json.dump(saved_articles, f, indent=2)
+    ### Call the model
+    model_output = call_model(month_of_pregnancy=month_of_pregnancy
+                              , topic = topic)
+    
+    ### Parse the model output
+    recommeneded_articles_to_dictionary = parse_articles(model_output)
+
+    ### Save the articles
+    save_to_json(recommeneded_articles_to_dictionary)
+
+
 
 
 
