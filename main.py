@@ -13,7 +13,9 @@ from langchain.chains import LLMChain, RetrievalQA
 from fastapi import FastAPI
 from pydantic import BaseModel
 import faiss
-from config import OPENAI_API_KEY, MODEL_NAME, TEMPERATURE
+from config import OPENAI_API_KEY, MODEL_NAME, TEMPERATURE 
+from fastapi_app.main import fastapi_handler  
+from pydantic import BaseModel
 
 # Set environment variables
 os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
@@ -111,28 +113,24 @@ class Doulala_model_build:
         )
         return self.Lala
 
-       
-        
-        
-    
-  
-
 # Initialize the model without passing prompt_structure
 model = Doulala_model_build() 
 model.build()  # Build the model before using it
 
 # Simple test command
-test_input = "What are the common symptoms in the third trimester of pregnancy?"
+test_input = "What are the common symptoms in the first trimester of pregnancy?"
 test_response = model.Lala.invoke({"input": test_input})
 print("\nTest Response:")
 print(test_response)
 
 Lala_API = FastAPI() 
 class UserQuery(BaseModel):
-    input: str
+    input: str 
+class ModelResponse():
+    response: str
 
 # POST endpoint
-@Lala_API.post("/query")
+@Lala_API.post("/query",  response_model=ModelResponse)
 async def query_model(data: UserQuery):
     response = model.Lala.invoke({"input": data.input})
     return {"response": response}
