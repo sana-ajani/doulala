@@ -14,13 +14,20 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import faiss
 from config import OPENAI_API_KEY, MODEL_NAME, TEMPERATURE 
-from fastapi_app.main import fastapi_handler  
+from dotenv import load_dotenv
+#from fastapi_app.main import fastapi_handler  
 from pydantic import BaseModel
 
-# Set environment variables
 os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 os.environ["MODEL_NAME"] = MODEL_NAME
 os.environ["TEMPERATURE"] = str(TEMPERATURE)
+#load_dotenv() 
+#load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))
+#OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+#print("API Key:", os.getenv("OPENAI_API_KEY"))
+#MODEL_NAME = os.getenv("MODEL_NAME")
+#TEMPERATURE = float(os.getenv("TEMPERATURE", 0.7))
+
 
 # Define the prompt structure
 PROMPT_STRUCTURE = """
@@ -85,14 +92,13 @@ class Doulala_model_build:
         
         # Get configuration from environment variables
         self.model_name = os.getenv("MODEL_NAME", "gpt-3.5-turbo")
-        self.temperature = float(os.getenv("TEMPERATURE", "0.3"))
+        self.temperature = float(os.getenv("TEMPERATURE", "0.7"))
         
         # Initialize the LLM with environment variables
         self.llm = ChatOpenAI(
-            model_name=self.model_name,
-            temperature=self.temperature,
-            openai_api_key=os.getenv("OPENAI_API_KEY")
-        )
+            model_name=MODEL_NAME,
+            temperature=TEMPERATURE,
+            openai_api_key=OPENAI_API_KEY)
         
         self.RagLayer = RetrievalQA.from_chain_type(llm=self.llm, 
                                                    retriever=self.vectorstore.retriever) 
@@ -126,7 +132,7 @@ print(test_response)
 Lala_API = FastAPI() 
 class UserQuery(BaseModel):
     input: str 
-class ModelResponse():
+class ModelResponse(BaseModel):
     response: str
 
 # POST endpoint

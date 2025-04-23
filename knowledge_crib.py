@@ -139,6 +139,7 @@ class KnowledgeCrib:
 
 
 KnowledgeCrib_model = KnowledgeCrib() 
+KnowledgeCrib_model.call_KnowledgeCrib()
 knowledge_crib_API = FastAPI() 
 class UserQuery(BaseModel):
     month_of_pregnancy: str
