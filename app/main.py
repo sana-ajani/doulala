@@ -13,15 +13,24 @@ from langchain.chains import LLMChain, RetrievalQA
 from fastapi import FastAPI
 from pydantic import BaseModel
 import faiss
-from config import OPENAI_API_KEY, MODEL_NAME, TEMPERATURE 
+from config import MODEL_NAME, TEMPERATURE 
 from dotenv import load_dotenv
 #from fastapi_app.main import fastapi_handler  
 from pydantic import BaseModel
 
-os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
+# os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 os.environ["MODEL_NAME"] = MODEL_NAME
 os.environ["TEMPERATURE"] = str(TEMPERATURE)
+<<<<<<< HEAD:app/main.py
 
+=======
+# load_dotenv() 
+# load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+# print("API Key:", os.getenv("OPENAI_API_KEY"))
+# MODEL_NAME = os.getenv("MODEL_NAME")
+# TEMPERATURE = float(os.getenv("TEMPERATURE", 0.7))
+>>>>>>> 08ca9d0ec2cb5daa491519af79f09a8fceb050e7:main.py
 
 
 # Define the prompt structure
