@@ -21,12 +21,7 @@ from pydantic import BaseModel
 os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 os.environ["MODEL_NAME"] = MODEL_NAME
 os.environ["TEMPERATURE"] = str(TEMPERATURE)
-#load_dotenv() 
-#load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))
-#OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-#print("API Key:", os.getenv("OPENAI_API_KEY"))
-#MODEL_NAME = os.getenv("MODEL_NAME")
-#TEMPERATURE = float(os.getenv("TEMPERATURE", 0.7))
+
 
 
 # Define the prompt structure
@@ -141,6 +136,12 @@ async def query_model(data: UserQuery):
     response = model.Lala.invoke({"input": data.input})
     return {"response": response}
 
+#mount both APIs to same app 
+app = FastAPI()
+
+# Mount both sub-apps
+app.mount("/doulala", Lala_API)
+app.mount("/crib", knowledge_crib_API)
 
 
 
