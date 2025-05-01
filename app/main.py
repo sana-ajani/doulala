@@ -10,27 +10,18 @@ from langchain_openai import ChatOpenAI
 from langchain_core.prompts import PromptTemplate 
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import LLMChain, RetrievalQA
-from fastapi import FastAPI
+from fastapi import FastAPI, APIRouter
 from pydantic import BaseModel
 import faiss
 from config import MODEL_NAME, TEMPERATURE 
 from dotenv import load_dotenv
 #from fastapi_app.main import fastapi_handler  
 from pydantic import BaseModel
+from datetime import datetime
 
 # os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 os.environ["MODEL_NAME"] = MODEL_NAME
 os.environ["TEMPERATURE"] = str(TEMPERATURE)
-<<<<<<< HEAD:app/main.py
-
-=======
-# load_dotenv() 
-# load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
-# print("API Key:", os.getenv("OPENAI_API_KEY"))
-# MODEL_NAME = os.getenv("MODEL_NAME")
-# TEMPERATURE = float(os.getenv("TEMPERATURE", 0.7))
->>>>>>> 08ca9d0ec2cb5daa491519af79f09a8fceb050e7:main.py
 
 
 # Define the prompt structure
@@ -151,6 +142,35 @@ app = FastAPI()
 # Mount both sub-apps
 app.mount("/doulala", Lala_API)
 app.mount("/crib", knowledge_crib_API)
+
+router = APIRouter()
+
+class ProfileData(BaseModel):
+    age: int
+    monthsToGo: int
+    dueDate: str
+
+@router.get("/api/profile")
+async def get_profile():
+    # Get these values from your knowledge_crib.py
+    mother_age = 27
+    month_of_pregnancy = 3
+    months_to_go = 9 - month_of_pregnancy
+    
+    # Calculate due date based on current date and months to go
+    # This is a simplified calculation - you might want to make it more accurate
+    due_date = datetime.now().date().replace(month=datetime.now().month + months_to_go)
+    
+    return {
+        "age": mother_age,
+        "monthsToGo": months_to_go,
+        "dueDate": due_date.strftime("%Y-%m-%d")
+    }
+
+@router.put("/api/profile/due-date")
+async def update_due_date(data: dict):
+    # Update the due date in your database/storage
+    return {"status": "success"}
 
 
 

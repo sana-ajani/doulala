@@ -61,15 +61,6 @@ export const IntroPage = (): JSX.Element => {
             <div className="relative w-36 h-[5px] top-[21px] left-[129px] bg-black rounded-[100px] rotate-180" />
           </div>
 
-          {/* iPhone frame */}
-          <div className="absolute w-[402px] h-[874px] top-0 left-0.5">
-            <img
-              className="absolute w-[450px] h-[920px] top-[-23px] -left-6 object-cover"
-              alt="iPhone frame"
-              src="/iphone-16-pro---black-titanium---portrait.png"
-            />
-          </div>
-
           {/* Authentication card */}
           <Card className="absolute w-[307px] h-36 top-[366px] left-[49px] border-none shadow-none">
             <CardContent className="p-0">

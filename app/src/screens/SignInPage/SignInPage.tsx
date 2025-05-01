@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
+import { useUser } from "../../context/UserContext";
 
 const signInSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -16,13 +17,15 @@ type SignInFormData = z.infer<typeof signInSchema>;
 
 export const SignInPage = (): JSX.Element => {
   const navigate = useNavigate();
+  const { setUserName } = useUser();
   const { register, handleSubmit, formState: { errors } } = useForm<SignInFormData>({
     resolver: zodResolver(signInSchema),
   });
 
   const onSubmit = (data: SignInFormData) => {
     console.log("Sign in data:", data);
-    // Add your sign in logic here
+    setUserName(data.name);
+    navigate("/home");
   };
 
   return (

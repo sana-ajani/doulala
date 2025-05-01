@@ -5,13 +5,14 @@ from langchain_openai import ChatOpenAI
 from langchain.chains import LLMChain
 from langchain.memory import ConversationBufferMemory
 import openai
-from fastapi import FastAPI
+from fastapi import FastAPI, APIRouter
 import random
 import re
 import json
 from langchain_community.tools import DuckDuckGoSearchRun 
 from langchain.agents import Tool 
 from pydantic import BaseModel
+from typing import List
 
 from dotenv import load_dotenv
 load_dotenv()  # Loads from .env file the API key
@@ -133,9 +134,9 @@ class KnowledgeCrib:
         model_output = self.call_model(month_of_pregnancy=month_of_pregnancy, topic=topic)
         
         # Parse the model output
-        recommeneded_articles_to_dictionary = model_output.parse_and_save_articles()
+        recommended_articles_to_dictionary = model_output.parse_and_save_articles()
 
-        return recommeneded_articles_to_dictionary  
+        return recommended_articles_to_dictionary  
 
 
 KnowledgeCrib_model = KnowledgeCrib() 
@@ -156,6 +157,39 @@ async def query_model(data: UserQuery):
     }
     response = KnowledgeCrib_model.call_KnowledgeCrib(model_input)
     return {"response": response}
+
+router = APIRouter()
+
+class ArticleRequest(BaseModel):
+    category: str
+    # Add other fields as needed
+    # age: int
+    # pregnancy_month: int
+
+class Article(BaseModel):
+    title: str
+    author: str
+    preview: str
+    url: str
+
+@router.get("/categories")
+async def get_categories():
+    return [
+        'patient_development',
+        'child_development',
+        'lifestyle',
+        'risks',
+        'wellness_mindfulness'
+    ]
+
+@router.post("/articles")
+async def get_articles(request: ArticleRequest) -> List[Article]:
+    # Your existing OpenAI logic here
+    # Use request.category and other fields to get relevant articles
+    # Return the articles in the format expected by the frontend
+    pass
+
+# Add this router to your main FastAPI app
 
 
 
