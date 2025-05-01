@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
+import { useUser } from "../../context/UserContext";
 
 const states = [
   "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", 
@@ -46,20 +47,22 @@ const signUpSchema = z.object({
   ethnicity: z.string().min(1, "Please select your ethnicity"),
   location: z.string().min(1, "Please select your location"),
   income: z.string().optional(),
-  preExistingConditions: z.array(z.string()).optional(),
+  preExistingConditions: z.string().optional(),
 });
 
 type SignUpFormData = z.infer<typeof signUpSchema>;
 
 export const SignUpPage = (): JSX.Element => {
   const navigate = useNavigate();
+  const { setUserName } = useUser();
   const { register, handleSubmit, formState: { errors } } = useForm<SignUpFormData>({
     resolver: zodResolver(signUpSchema),
   });
 
   const onSubmit = (data: SignUpFormData) => {
     console.log("Sign up data:", data);
-    // Add your sign up logic here
+    setUserName(data.name);
+    navigate("/home");
   };
 
   return (
@@ -221,11 +224,10 @@ export const SignUpPage = (): JSX.Element => {
                   Pre-existing Conditions
                 </label>
                 <select
-                  multiple
                   {...register("preExistingConditions")}
                   className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#082154]"
-                  size={5}
                 >
+                  <option value="">Select condition</option>
                   {preExistingConditions.map((condition) => (
                     <option key={condition} value={condition}>
                       {condition}
