@@ -13,6 +13,7 @@ from langchain_community.tools import DuckDuckGoSearchRun
 from langchain.agents import Tool 
 from pydantic import BaseModel
 from typing import List
+from fastapi.middleware.cors import CORSMiddleware
 
 from dotenv import load_dotenv
 load_dotenv()  # Loads from .env file the API key
@@ -190,6 +191,14 @@ async def get_articles(request: ArticleRequest) -> List[Article]:
     pass
 
 # Add this router to your main FastAPI app
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Or your frontend URL
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 
