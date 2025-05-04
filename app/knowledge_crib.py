@@ -134,14 +134,15 @@ class KnowledgeCrib:
         # Call the model
         model_output = self.call_model(month_of_pregnancy=month_of_pregnancy, topic=topic)
         
+        output_saver = ArticleSaver()
         # Parse the model output
-        recommended_articles_to_dictionary = model_output.parse_and_save_articles()
+        recommended_articles_to_dictionary = output_saver.parse_and_save_articles(model_output)
 
         return recommended_articles_to_dictionary  
 
 
 KnowledgeCrib_model = KnowledgeCrib() 
-KnowledgeCrib_model.call_KnowledgeCrib()
+KnowledgeCrib_model.call_KnowledgeCrib(month_of_pregnancy=3, topic="child_development")
 knowledge_crib_API = FastAPI() 
 class UserQuery(BaseModel):
     month_of_pregnancy: str
@@ -156,49 +157,10 @@ async def query_model(data: UserQuery):
         "month_of_pregnancy": data.month_of_pregnancy,
         "topic": data.topic
     }
-    response = KnowledgeCrib_model.call_KnowledgeCrib(model_input)
+    response = KnowledgeCrib_model.call_KnowledgeCrib(**model_input)
     return {"response": response}
 
-router = APIRouter()
 
-class ArticleRequest(BaseModel):
-    category: str
-    # Add other fields as needed
-    # age: int
-    # pregnancy_month: int
-
-class Article(BaseModel):
-    title: str
-    author: str
-    preview: str
-    url: str
-
-@router.get("/categories")
-async def get_categories():
-    return [
-        'patient_development',
-        'child_development',
-        'lifestyle',
-        'risks',
-        'wellness_mindfulness'
-    ]
-
-@router.post("/articles")
-async def get_articles(request: ArticleRequest) -> List[Article]:
-    # Your existing OpenAI logic here
-    # Use request.category and other fields to get relevant articles
-    # Return the articles in the format expected by the frontend
-    pass
-
-# Add this router to your main FastAPI app
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Or your frontend URL
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 
 

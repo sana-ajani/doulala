@@ -22,7 +22,8 @@ from datetime import datetime
 # os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 os.environ["MODEL_NAME"] = MODEL_NAME
 os.environ["TEMPERATURE"] = str(TEMPERATURE)
-
+os.getenv("OPENAI_API_KEY")
+from dotenv import load_dotenv
 
 # Define the prompt structure
 PROMPT_STRUCTURE = """
@@ -93,7 +94,7 @@ class Doulala_model_build:
         self.llm = ChatOpenAI(
             model_name=MODEL_NAME,
             temperature=TEMPERATURE,
-            openai_api_key=OPENAI_API_KEY)
+            openai_api_key=os.getenv("OPENAI_API_KEY"))
         
         self.RagLayer = RetrievalQA.from_chain_type(llm=self.llm, 
                                                    retriever=self.vectorstore.retriever) 
@@ -135,47 +136,6 @@ class ModelResponse(BaseModel):
 async def query_model(data: UserQuery):
     response = model.Lala.invoke({"input": data.input})
     return {"response": response}
-
-#mount both APIs to same app 
-app = FastAPI()
-
-# Mount both sub-apps
-app.mount("/doulala", Lala_API)
-app.mount("/crib", knowledge_crib_API)
-
-router = APIRouter()
-
-class ProfileData(BaseModel):
-    age: int
-    monthsToGo: int
-    dueDate: str
-
-@router.get("/api/profile")
-async def get_profile():
-    # Get these values from your knowledge_crib.py
-    mother_age = 27
-    month_of_pregnancy = 3
-    months_to_go = 9 - month_of_pregnancy
-    
-    # Calculate due date based on current date and months to go
-    # This is a simplified calculation - you might want to make it more accurate
-    due_date = datetime.now().date().replace(month=datetime.now().month + months_to_go)
-    
-    return {
-        "age": mother_age,
-        "monthsToGo": months_to_go,
-        "dueDate": due_date.strftime("%Y-%m-%d")
-    }
-
-@router.put("/api/profile/due-date")
-async def update_due_date(data: dict):
-    # Update the due date in your database/storage
-    return {"status": "success"}
-
-
-
-        
-
 
 
 
