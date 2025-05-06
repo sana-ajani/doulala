@@ -8,11 +8,13 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy all app code
-COPY . .
+# Copy all app code 
+COPY .venv /app/.venv
+COPY . . 
 
 # Expose port 8080 for Firebase App Hosting
 EXPOSE 8080
 
 # Command to run FastAPI server
-CMD ["uvicorn", "main:Lala_API", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
+
