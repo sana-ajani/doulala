@@ -5,7 +5,9 @@ from main import Lala_API  # Import the Lala API
 from fastapi import APIRouter
 from pydantic import BaseModel
 from datetime import datetime
-from typing import List
+from typing import List  
+from manngum import Mangum
+import os
 
 # Initialize the main FastAPI app
 app = FastAPI()
@@ -35,10 +37,8 @@ class ProfileData(BaseModel):
     dueDate: str
 
 @router.get("/api/profile")
-async def get_profile():
+async def get_profile(mother_age: int = 27, month_of_pregnancy: int = 3):
     # Example values
-    mother_age = 27
-    month_of_pregnancy = 3
     months_to_go = 9 - month_of_pregnancy
 
     # Calculate due date
@@ -88,4 +88,19 @@ async def get_articles(request: ArticleRequest) -> List[Article]:
     ]
 
 # Include the router in the main app
-app.include_router(router)
+app.include_router(router) 
+@app.get("/")
+def home():
+    return {"message": "it works"}
+port = int(os.getenv("PORT", 8080))  # Default to 8080 if PORT is not set
+
+def Expose(request): 
+    handler = Mangum(bapp)
+    return handler(request) 
+
+
+
+# Start the FastAPI server
+#if __name__ == "__main__":
+    #import uvicorn
+    #uvicorn.run(app, host="0.0.0.0", port=port)    

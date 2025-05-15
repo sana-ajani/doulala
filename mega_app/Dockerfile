@@ -9,12 +9,14 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy all app code 
-COPY .venv /app/.venv
+ 
 COPY . . 
 
 # Expose port 8080 for Firebase App Hosting
+ENV HOST=0.0.0.0
+ENV PORT=8080
 EXPOSE 8080
 
 # Command to run FastAPI server
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["uvicorn", "mega_api:app", "--host", "0.0.0.0", "--port", "8080"]
 
