@@ -1,18 +1,17 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from knowledge_crib import knowledge_crib_API  # Import the Knowledge Crib API
-from main import Lala_API  # Import the Lala API
+from mega_app.knowledge_crib import knowledge_crib_API  # Import the Knowledge Crib API
+from mega_app.main import Lala_API  # Import the Lala API
 from fastapi import APIRouter
 from pydantic import BaseModel
 from datetime import datetime
 from typing import List  
-from manngum import Mangum
+from mangum import Mangum
 import os
+import functions_framework
 
 # Initialize the main FastAPI app
 app = FastAPI()
-app.mount("/doulala", Lala_API)
-app.mount("/crib", knowledge_crib_API) 
 
 # Add CORS middleware
 app.add_middleware(
@@ -89,16 +88,22 @@ async def get_articles(request: ArticleRequest) -> List[Article]:
 
 # Include the router in the main app
 app.include_router(router) 
+
 @app.get("/")
 def home():
     return {"message": "it works"}
-port = int(os.getenv("PORT", 8080))  # Default to 8080 if PORT is not set
 
-def Expose(request): 
-    handler = Mangum(bapp)
-    return handler(request) 
+# Create a single Mangum handler for both environments
+handler = Mangum(app)
 
+# AWS Lambda handler
+def Expose(request):
+    return handler(request)
 
+# Google Cloud Functions handler
+@functions_framework.http
+def doulala(request):
+    return handler(request)
 
 # Start the FastAPI server
 #if __name__ == "__main__":

@@ -1,3 +1,9 @@
-fastapi
-mangum
-functions-framework
+fastapi==0.100.0
+mangum==0.15.0
+functions-framework==3.3.0
+packaging==23.2 
+streamlit 
+numpy==1.26.0
+contourpy==1.2.0
+numba==0.59.1
+pywavelets==1.5.0 

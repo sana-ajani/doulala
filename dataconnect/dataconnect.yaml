@@ -1,0 +1,12 @@
+specVersion: "v1"
+serviceId: "douala-version1"
+location: "us-central1"
+schema:
+  source: "./schema"
+  datasource:
+    postgresql:
+      database: "Doulala_fbdb"
+      cloudSql:
+        instanceId: "douala-version1-fdc"
+      # schemaValidation: "COMPATIBLE"
+connectorDirs: ["./connector"]
